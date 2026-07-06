@@ -85,3 +85,14 @@ func (cli *Client) GetRecommendedNewsletters(ctx context.Context, countryCodes [
 		HasNextPage: resp.Recommended.PageInfo.HasNextPage,
 	}, nil
 }
+
+// GetNewsletterSubscribersRaw calls WhatsApp's channel-subscribers query (queryNewsletterSubscribers)
+// and returns the raw GraphQL response, since the response shape isn't confirmed yet (unlike the
+// directory queries, this one likely needs you to be the channel's owner/admin - untested).
+//
+// Internal/reverse-engineered, may change or stop working without notice.
+func (cli *Client) GetNewsletterSubscribersRaw(ctx context.Context, jid types.JID, count int) (json.RawMessage, error) {
+	return cli.sendMexIQ(ctx, queryNewsletterSubscribers, map[string]any{
+		"input": map[string]any{"newsletter_id": jid.String(), "count": count},
+	})
+}
